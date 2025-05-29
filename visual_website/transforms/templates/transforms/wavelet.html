@@ -1,0 +1,104 @@
+{% extends 'transforms/base.html' %}
+
+{% block title %}小波变换可视化{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">
+                    <i class="bi bi-soundwave text-info"></i>
+                    小波变换可视化
+                </h2>
+                <p class="card-text">
+                    使用小波变换进行信号去噪处理
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="control-panel">
+            <h5 class="mb-3">
+                <i class="bi bi-sliders"></i>
+                参数控制
+            </h5>
+            <form id="paramForm">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="noise_level" class="form-label">噪声强度</label>
+                    <input type="range" class="form-range" id="noise_level" name="noise_level" 
+                           min="0.1" max="1.0" value="0.5" step="0.1">
+                    <div class="d-flex justify-content-between">
+                        <small>0.1</small>
+                        <span id="noiseLevelValue" class="fw-bold">0.5</span>
+                        <small>1.0</small>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="threshold" class="form-label">去噪阈值</label>
+                    <input type="range" class="form-range" id="threshold" name="threshold" 
+                           min="0.1" max="0.8" value="0.3" step="0.05">
+                    <div class="d-flex justify-content-between">
+                        <small>0.1</small>
+                        <span id="thresholdValue" class="fw-bold">0.3</span>
+                        <small>0.8</small>
+                    </div>
+                </div>
+                
+                <button type="button" class="btn btn-custom w-100" onclick="updateTransform('wavelet')">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    重新计算
+                </button>
+            </form>
+            
+            <div class="mt-4">
+                <h6>小波去噪原理</h6>
+                <p class="small text-muted">
+                    使用Daubechies小波进行多尺度分解，
+                    通过软阈值处理去除噪声成分，
+                    然后重构得到去噪后的信号。
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="result-panel">
+            <div id="loading" class="text-center loading">
+                <div class="spinner-border text-info" role="status">
+                    <span class="visually-hidden">计算中...</span>
+                </div>
+                <p class="mt-2">正在进行小波变换...</p>
+            </div>
+            
+            <div id="result" style="display: none;">
+                <div class="text-center">
+                    <img id="resultImage" src="" alt="变换结果" class="img-fluid rounded">
+                    <p id="resultInfo" class="mt-2 text-muted"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('noise_level').addEventListener('input', function() {
+        document.getElementById('noiseLevelValue').textContent = this.value;
+    });
+    
+    document.getElementById('threshold').addEventListener('input', function() {
+        document.getElementById('thresholdValue').textContent = this.value;
+    });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        setupAutoUpdate('wavelet');
+    });
+</script>
+{% endblock %}

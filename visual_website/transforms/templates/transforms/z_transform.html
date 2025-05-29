@@ -1,0 +1,99 @@
+{% extends 'transforms/base.html' %}
+
+{% block title %}Z变换可视化{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">
+                    <i class="bi bi-bar-chart text-danger"></i>
+                    Z变换可视化
+                </h2>
+                <p class="card-text">
+                    观察离散时间信号的Z变换零极点图
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="control-panel">
+            <h5 class="mb-3">
+                <i class="bi bi-sliders"></i>
+                参数控制
+            </h5>
+            <form id="paramForm">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="a" class="form-label">参数 a</label>
+                    <input type="range" class="form-range" id="a" name="a" 
+                           min="0.1" max="0.9" value="0.5" step="0.1">
+                    <div class="d-flex justify-content-between">
+                        <small>0.1</small>
+                        <span id="aValue" class="fw-bold">0.5</span>
+                        <small>0.9</small>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="n_points" class="form-label">信号长度</label>
+                    <select class="form-select" id="n_points" name="n_points">
+                        <option value="5">5个点</option>
+                        <option value="10" selected>10个点</option>
+                        <option value="15">15个点</option>
+                        <option value="20">20个点</option>
+                    </select>
+                </div>
+                
+                <button type="button" class="btn btn-custom w-100" onclick="updateTransform('z_transform')">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    重新计算
+                </button>
+            </form>
+            
+            <div class="mt-4">
+                <h6>信号特性</h6>
+                <p class="small text-muted">
+                    信号: x[n] = a^n u[n]<br>
+                    Z变换: X(z) = z/(z-a)<br>
+                    零点在原点，极点在z=a处
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="result-panel">
+            <div id="loading" class="text-center loading">
+                <div class="spinner-border text-danger" role="status">
+                    <span class="visually-hidden">计算中...</span>
+                </div>
+                <p class="mt-2">正在计算Z变换...</p>
+            </div>
+            
+            <div id="result" style="display: none;">
+                <div class="text-center">
+                    <img id="resultImage" src="" alt="变换结果" class="img-fluid rounded">
+                    <p id="resultInfo" class="mt-2 text-muted"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('a').addEventListener('input', function() {
+        document.getElementById('aValue').textContent = this.value;
+    });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        setupAutoUpdate('z_transform');
+    });
+</script>
+{% endblock %}

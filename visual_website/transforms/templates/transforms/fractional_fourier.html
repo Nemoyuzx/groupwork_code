@@ -1,0 +1,120 @@
+{% extends 'transforms/base.html' %}
+
+{% block title %}分数傅里叶变换可视化{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">
+                    <i class="bi bi-shuffle text-secondary"></i>
+                    分数傅里叶变换可视化
+                </h2>
+                <p class="card-text">
+                    分数傅里叶变换用于时频域的旋转变换，特别适用于chirp信号分析
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="control-panel">
+            <h5 class="mb-3">
+                <i class="bi bi-sliders"></i>
+                参数控制
+            </h5>
+            <form id="paramForm">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="alpha" class="form-label">变换阶数 α</label>
+                    <input type="range" class="form-range" id="alpha" name="alpha" 
+                           min="0" max="2" value="0.5" step="0.1">
+                    <div class="d-flex justify-content-between">
+                        <small>0</small>
+                        <span id="alphaValue" class="fw-bold">0.5</span>
+                        <small>2</small>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="f0" class="form-label">起始频率 (Hz)</label>
+                    <input type="range" class="form-range" id="f0" name="f0" 
+                           min="1" max="10" value="2" step="1">
+                    <div class="d-flex justify-content-between">
+                        <small>1</small>
+                        <span id="f0Value" class="fw-bold">2</span>
+                        <small>10</small>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="f1" class="form-label">终止频率 (Hz)</label>
+                    <input type="range" class="form-range" id="f1" name="f1" 
+                           min="10" max="50" value="20" step="5">
+                    <div class="d-flex justify-content-between">
+                        <small>10</small>
+                        <span id="f1Value" class="fw-bold">20</span>
+                        <small>50</small>
+                    </div>
+                </div>
+                
+                <button type="button" class="btn btn-custom w-100" onclick="updateTransform('fractional_fourier')">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    重新计算
+                </button>
+            </form>
+            
+            <div class="mt-4">
+                <h6>分数傅里叶变换</h6>
+                <p class="small text-muted">
+                    α=0: 原信号<br>
+                    α=1: 标准傅里叶变换<br>
+                    α=0.5: 时频域45度旋转<br>
+                    适用于线性调频信号分析
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="result-panel">
+            <div id="loading" class="text-center loading">
+                <div class="spinner-border text-secondary" role="status">
+                    <span class="visually-hidden">计算中...</span>
+                </div>
+                <p class="mt-2">正在计算分数傅里叶变换...</p>
+            </div>
+            
+            <div id="result" style="display: none;">
+                <div class="text-center">
+                    <img id="resultImage" src="" alt="变换结果" class="img-fluid rounded">
+                    <p id="resultInfo" class="mt-2 text-muted"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('alpha').addEventListener('input', function() {
+        document.getElementById('alphaValue').textContent = this.value;
+    });
+    
+    document.getElementById('f0').addEventListener('input', function() {
+        document.getElementById('f0Value').textContent = this.value;
+    });
+    
+    document.getElementById('f1').addEventListener('input', function() {
+        document.getElementById('f1Value').textContent = this.value;
+    });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        setupAutoUpdate('fractional_fourier');
+    });
+</script>
+{% endblock %}

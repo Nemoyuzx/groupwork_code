@@ -1,0 +1,138 @@
+{% extends 'transforms/base.html' %}
+
+{% block title %}拉普拉斯变换可视化{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">
+                    <i class="bi bi-graph-down text-success"></i>
+                    拉普拉斯变换可视化
+                </h2>
+                <p class="card-text">
+                    观察一阶系统对单位阶跃输入的响应特性
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="control-panel">
+            <h5 class="mb-3">
+                <i class="bi bi-sliders"></i>
+                参数控制
+            </h5>
+            <form id="paramForm">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="input_signal" class="form-label">输入信号类型</label>
+                    <select class="form-select" id="input_signal" name="input_signal">
+                        <option value="step" selected>单位阶跃函数 u(t)</option>
+                        <option value="impulse">单位冲激函数 δ(t)</option>
+                        <option value="ramp">单位斜坡函数 t·u(t)</option>
+                        <option value="exponential">指数函数 e^(-at)·u(t)</option>
+                        <option value="sine">正弦函数 sin(ωt)·u(t)</option>
+                        <option value="cosine">余弦函数 cos(ωt)·u(t)</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="system_param" class="form-label">系统参数 (a)</label>
+                    <input type="range" class="form-range" id="system_param" name="system_param" 
+                           min="0.5" max="5" value="2" step="0.1">
+                    <div class="d-flex justify-content-between">
+                        <small>0.5</small>
+                        <span id="systemParamValue" class="fw-bold">2</span>
+                        <small>5</small>
+                    </div>
+                </div>
+                
+                <div class="mb-3" id="frequencyControl" style="display: none;">
+                    <label for="signal_frequency" class="form-label">信号频率 (ω)</label>
+                    <input type="range" class="form-range" id="signal_frequency" name="signal_frequency" 
+                           min="1" max="10" value="2" step="0.5">
+                    <div class="d-flex justify-content-between">
+                        <small>1</small>
+                        <span id="signalFrequencyValue" class="fw-bold">2</span>
+                        <small>10</small>
+                    </div>
+                </div>
+                
+                <button type="button" class="btn btn-custom w-100" onclick="updateTransform('laplace')">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    重新计算
+                </button>
+            </form>
+            
+            <div class="mt-4">
+                <h6>系统特性</h6>
+                <p class="small text-muted">
+                    传递函数: H(s) = 1/(s + a)<br>
+                    <span id="inputDescription">输入: 单位阶跃函数 u(t)</span><br>
+                    系统参数a越大，响应速度越快
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="result-panel">
+            <div id="loading" class="text-center loading">
+                <div class="spinner-border text-success" role="status">
+                    <span class="visually-hidden">计算中...</span>
+                </div>
+                <p class="mt-2">正在计算拉普拉斯变换...</p>
+            </div>
+            
+            <div id="result" style="display: none;">
+                <div class="text-center">
+                    <img id="resultImage" src="" alt="变换结果" class="img-fluid rounded">
+                    <p id="resultInfo" class="mt-2 text-muted"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('system_param').addEventListener('input', function() {
+        document.getElementById('systemParamValue').textContent = this.value;
+    });
+    
+    document.getElementById('signal_frequency').addEventListener('input', function() {
+        document.getElementById('signalFrequencyValue').textContent = this.value;
+    });
+    
+    document.getElementById('input_signal').addEventListener('change', function() {
+        const frequencyControl = document.getElementById('frequencyControl');
+        const inputDescription = document.getElementById('inputDescription');
+        
+        const descriptions = {
+            'step': '输入: 单位阶跃函数 u(t)',
+            'impulse': '输入: 单位冲激函数 δ(t)',
+            'ramp': '输入: 单位斜坡函数 t·u(t)',
+            'exponential': '输入: 指数函数 e^(-at)·u(t)',
+            'sine': '输入: 正弦函数 sin(ωt)·u(t)',
+            'cosine': '输入: 余弦函数 cos(ωt)·u(t)'
+        };
+        
+        inputDescription.textContent = descriptions[this.value] || descriptions['step'];
+        
+        if (this.value === 'sine' || this.value === 'cosine') {
+            frequencyControl.style.display = 'block';
+        } else {
+            frequencyControl.style.display = 'none';
+        }
+    });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        setupAutoUpdate('laplace');
+    });
+</script>
+{% endblock %}

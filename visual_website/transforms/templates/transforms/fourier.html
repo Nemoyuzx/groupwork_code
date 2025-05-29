@@ -1,0 +1,100 @@
+{% extends 'transforms/base.html' %}
+
+{% block title %}傅里叶变换可视化{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">
+                    <i class="bi bi-waveform text-primary"></i>
+                    傅里叶变换可视化
+                </h2>
+                <p class="card-text">
+                    调节信号频率和采样率参数，实时观察时域信号与频域谱的对应关系
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="control-panel">
+            <h5 class="mb-3">
+                <i class="bi bi-sliders"></i>
+                参数控制
+            </h5>
+            <form id="paramForm">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="frequency" class="form-label">信号频率 (Hz)</label>
+                    <input type="range" class="form-range" id="frequency" name="frequency" 
+                           min="1" max="20" value="5" step="0.5">
+                    <div class="d-flex justify-content-between">
+                        <small>1 Hz</small>
+                        <span id="frequencyValue" class="fw-bold">5 Hz</span>
+                        <small>20 Hz</small>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="sample_rate" class="form-label">采样率</label>
+                    <select class="form-select" id="sample_rate" name="sample_rate">
+                        <option value="500">500 Hz</option>
+                        <option value="1000" selected>1000 Hz</option>
+                        <option value="2000">2000 Hz</option>
+                        <option value="4000">4000 Hz</option>
+                    </select>
+                </div>
+                
+                <button type="button" class="btn btn-custom w-100" onclick="updateTransform('fourier')">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    重新计算
+                </button>
+            </form>
+            
+            <div class="mt-4">
+                <h6>说明</h6>
+                <p class="small text-muted">
+                    傅里叶变换将时域信号转换为频域表示。左图显示原始的正弦波信号，
+                    右图显示其频谱，主要能量集中在设定的频率处。
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="result-panel">
+            <div id="loading" class="text-center loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">计算中...</span>
+                </div>
+                <p class="mt-2">正在计算傅里叶变换...</p>
+            </div>
+            
+            <div id="result" style="display: none;">
+                <div class="text-center">
+                    <img id="resultImage" src="" alt="变换结果" class="img-fluid rounded">
+                    <p id="resultInfo" class="mt-2 text-muted"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 更新频率显示
+    document.getElementById('frequency').addEventListener('input', function() {
+        document.getElementById('frequencyValue').textContent = this.value + ' Hz';
+    });
+    
+    // 页面加载时初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        setupAutoUpdate('fourier');
+    });
+</script>
+{% endblock %}

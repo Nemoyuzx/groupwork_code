@@ -1,0 +1,135 @@
+{% extends 'transforms/base.html' %}
+
+{% block title %}霍夫变换可视化{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">
+                    <i class="bi bi-shapes text-warning"></i>
+                    霍夫变换可视化
+                </h2>
+                <p class="card-text">
+                    使用霍夫变换检测图像中的几何形状（直线、圆形、矩形）
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="control-panel">
+            <h5 class="mb-3">
+                <i class="bi bi-sliders"></i>
+                参数控制
+            </h5>
+            <form id="paramForm">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="shape_type" class="form-label">检测形状类型</label>
+                    <select class="form-select" id="shape_type" name="shape_type">
+                        <option value="circles" selected>圆形检测</option>
+                        <option value="lines">直线检测</option>
+                        <option value="rectangles">矩形检测</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3" id="circleOptions">
+                    <label for="num_circles" class="form-label">圆形数量</label>
+                    <select class="form-select" id="num_circles" name="num_circles">
+                        <option value="1">1个圆</option>
+                        <option value="2">2个圆</option>
+                        <option value="3" selected>3个圆</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3" id="lineOptions" style="display: none;">
+                    <label for="num_lines" class="form-label">直线数量</label>
+                    <select class="form-select" id="num_lines" name="num_lines">
+                        <option value="2">2条直线</option>
+                        <option value="3" selected>3条直线</option>
+                        <option value="4">4条直线</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3" id="rectangleOptions" style="display: none;">
+                    <label for="num_rectangles" class="form-label">矩形数量</label>
+                    <select class="form-select" id="num_rectangles" name="num_rectangles">
+                        <option value="1">1个矩形</option>
+                        <option value="2" selected>2个矩形</option>
+                        <option value="3">3个矩形</option>
+                    </select>
+                </div>
+                
+                <button type="button" class="btn btn-custom w-100" onclick="updateTransform('hough')">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    重新计算
+                </button>
+            </form>
+            
+            <div class="mt-4">
+                <h6>霍夫变换</h6>
+                <p class="small text-muted">
+                    <span id="shapeDescription">
+                        霍夫变换是一种特征检测技术，特别适用于检测图像中的几何形状。当前模式：圆形检测
+                    </span>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="result-panel">
+            <div id="loading" class="text-center loading">
+                <div class="spinner-border text-warning" role="status">
+                    <span class="visually-hidden">计算中...</span>
+                </div>
+                <p class="mt-2">正在进行霍夫变换...</p>
+            </div>
+            
+            <div id="result" style="display: none;">
+                <div class="text-center">
+                    <img id="resultImage" src="" alt="变换结果" class="img-fluid rounded">
+                    <p id="resultInfo" class="mt-2 text-muted"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('shape_type').addEventListener('change', function() {
+        const shapeType = this.value;
+        const circleOptions = document.getElementById('circleOptions');
+        const lineOptions = document.getElementById('lineOptions');
+        const rectangleOptions = document.getElementById('rectangleOptions');
+        const shapeDescription = document.getElementById('shapeDescription');
+        
+        // 隐藏所有选项
+        circleOptions.style.display = 'none';
+        lineOptions.style.display = 'none';
+        rectangleOptions.style.display = 'none';
+        
+        // 显示相应的选项并更新描述
+        if (shapeType === 'circles') {
+            circleOptions.style.display = 'block';
+            shapeDescription.textContent = '霍夫变换是一种特征检测技术，特别适用于检测图像中的几何形状。当前模式：圆形检测';
+        } else if (shapeType === 'lines') {
+            lineOptions.style.display = 'block';
+            shapeDescription.textContent = '霍夫变换是一种特征检测技术，特别适用于检测图像中的几何形状。当前模式：直线检测';
+        } else if (shapeType === 'rectangles') {
+            rectangleOptions.style.display = 'block';
+            shapeDescription.textContent = '霍夫变换是一种特征检测技术，特别适用于检测图像中的几何形状。当前模式：矩形检测';
+        }
+    });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        setupAutoUpdate('hough');
+    });
+</script>
+{% endblock %}

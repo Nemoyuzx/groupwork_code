@@ -1,0 +1,125 @@
+{% extends 'transforms/base.html' %}
+
+{% block title %}变换可视化工具 - 主页{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <h1 class="card-title mb-3">
+                    <i class="bi bi-graph-up text-primary"></i>
+                    变换可视化工具
+                </h1>
+                <p class="card-text lead">
+                    实时可视化各种数学变换，支持参数调节和交互式渲染
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 transform-card">
+            <div class="card-body text-center">
+                <i class="bi bi-activity display-4 text-primary mb-3"></i>
+                <h5 class="card-title">傅里叶变换</h5>
+                <p class="card-text">将时域信号转换为频域表示，观察信号的频谱特性</p>
+                <a href="{% url 'fourier' %}" class="btn btn-custom">开始使用</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 transform-card">
+            <div class="card-body text-center">
+                <i class="bi bi-graph-down display-4 text-success mb-3"></i>
+                <h5 class="card-title">拉普拉斯变换</h5>
+                <p class="card-text">分析线性时不变系统的响应特性</p>
+                <a href="{% url 'laplace' %}" class="btn btn-custom">开始使用</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 transform-card">
+            <div class="card-body text-center">
+                <i class="bi bi-soundwave display-4 text-info mb-3"></i>
+                <h5 class="card-title">小波变换</h5>
+                <p class="card-text">时频分析和信号去噪处理</p>
+                <a href="{% url 'wavelet' %}" class="btn btn-custom">开始使用</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 transform-card">
+            <div class="card-body text-center">
+                <i class="bi bi-circle display-4 text-warning mb-3"></i>
+                <h5 class="card-title">霍夫变换</h5>
+                <p class="card-text">图像中的几何形状检测</p>
+                <a href="{% url 'hough' %}" class="btn btn-custom">开始使用</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 transform-card">
+            <div class="card-body text-center">
+                <i class="bi bi-bar-chart display-4 text-danger mb-3"></i>
+                <h5 class="card-title">Z变换</h5>
+                <p class="card-text">离散时间系统的分析工具</p>
+                <a href="{% url 'z_transform' %}" class="btn btn-custom">开始使用</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 transform-card">
+            <div class="card-body text-center">
+                <i class="bi bi-shuffle display-4 text-secondary mb-3"></i>
+                <h5 class="card-title">分数傅里叶变换</h5>
+                <p class="card-text">时频域旋转变换，适用于chirp信号分析</p>
+                <a href="{% url 'fractional_fourier' %}" class="btn btn-custom">开始使用</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">功能特点</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6><i class="bi bi-sliders text-primary"></i> 实时参数调节</h6>
+                        <p class="small">拖动滑块或输入数值，实时观察变换效果</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="bi bi-eye text-success"></i> 可视化渲染</h6>
+                        <p class="small">高质量的图表展示变换前后的对比效果</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="bi bi-palette text-info"></i> 现代界面</h6>
+                        <p class="small">简洁美观的用户界面，支持响应式设计</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+.transform-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.transform-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(31, 38, 135, 0.5) !important;
+}
+</style>
+{% endblock %}
