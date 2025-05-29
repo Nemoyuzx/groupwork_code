@@ -145,6 +145,5 @@ ehthumbs.db
 Thumbs.db
 
 # Project specific
-static/
 media/
 *.sqlite3
